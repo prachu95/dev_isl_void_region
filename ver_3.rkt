@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ver_2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ver_3) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 #|
 Proposal :
 
@@ -65,6 +65,14 @@ Proposal :
 ; Initial game status
 (define initial_game_status #true)
 
+; Object width
+(define object_width (* 0.01 world-width))
+
+; Object Height
+(define object_height (*0.01 world-height))
+
+
+
 
 
 
@@ -79,65 +87,6 @@ Proposal :
 
 
 ;; Function Wish list
-
-
-; draw_shapes : World -> Image
-; A random number will be used to draw the shape.
-; Using that random number the respective shapes will be printed
-; In the respective left and right positions as defined in the world.
-
-(define (draw_shapes world)
-  (cond
-    [...]
-    [else...]))
-  
-; key: World Key Event -> World
-; This function would check if a key was pressed or not.
-; Considering SpaceBar for the game play
-; Toggles the world-status and calls
-; the status check function. 
-
-(define (key world key_event)
-  (cond
-    [...]
-    [else...]))
-
-
-; draw_void_region : World -> Image
-; To draw the void region based on the level from the world.
-; Using the level and the "void_region_ramp_up" rate draws the void region.
-; Game stops when the void_region is equalto or greater than the width. That's the max-level.
-; Call win_game function accordingly
-
-
-(define (draw_void_region world)
-  (cond
-    [...]
-    [else...]))
-
-
-; tick : world -> world
-; Updates the world by updating the
-; positions of the left and right image respectively.
-; When objects reach the corner's the positions are reset. 
-
-(define (tick world)
-  (cond
-    [...]
-    [else...]))
-
-
-; game_speed : world -> number
-; Using the level from the world the game speed
-; is calculated and returned as a fraction
-; which is used in the big bang. All this is done
-; using the "initial_object_speed" & "object_speed_ramp_up"
-
-(define (game_speed world)
-  (cond
-    [...]
-    [else...]))
-
 
 ; win_game : world -> Image
 ; Toggles the world status to false
@@ -155,33 +104,114 @@ Proposal :
     [else...]))
 
 
-; draw_level : world -> Image
-; Using the level from the world
-; & using the "world-width" and "world-height"
-; the level is displayed for the user to
-; keep a tab. In the top right corner. 
-
-(define (draw_level world))
-
-
 ; status_check : world -> world
 ; All this only if world-status is false. 
 ; Using the positions of the right and
 ; left image, it checks if it has intersected
 ; or not. If true it updates the level and resets
-; image positions and the game play to true.
-; If it did not intersect, then it resets the positions
-; and changes the world-status to true. ( Basically the
-; same as former without updating the level).
+; image positions.
+; If it did not intersect, then it just resets the positions
+;(Basically the same as former without updating the level).
 
 (define (status_check world)
   (cond
     [...]
     [else...]))
 
+
+
+; key: World Key Event -> World
+; This function would check if a key was pressed or not.
+; Considering SpaceBar for the game play
+; Toggles the world-status and calls
+; the status check function.  
+
+(define (key world key_event)
+  (cond
+    [...]
+    [else...]))
+
+
+; game_speed : world -> number
+; Using the level from the world the game speed
+; is calculated and returned as a fraction
+; which is used in the big bang. All this is done
+; using the "initial_object_speed" & "object_speed_ramp_up"
+
+(define (game_speed world)
+  (cond
+    [...]
+    [else...]))
+
+
+
+; tick : world -> world
+; Updates the world by updating the
+; positions of the left and right image respectively.
+; When objects reach the corner's the positions are reset. 
+
+(define (tick world)
+  (cond
+    [...]
+    [else...]))
+
+
+; draw_object_left : World -> Image
+; A random number will be used to draw the shape. 
+; Using that random number the respective shapes will be placed (like switch case,
+; we may have  multiple predefined shapes with set "object_width" & "object_height")
+; In the respective left position as defined in the world the image is drawn.
+; For the final scene parameter while placing the image, this calls "draw_shape_right"
+
+(define (draw_object_left world)
+  (cond
+    [...]
+    [else...]))
+
+
+; draw_object_right : World -> Image
+; A random number will be used to draw the shape. 
+; Using that random number the respective shapes will be placed (like switch case,
+; we may have  multiple predefined shapes with set "object_width" & "object_height")
+; In the respective right position as defined in the world the image is drawn.
+; For the final scene parameter while placing the image, this calls "draw_void_region"
+
+(define (draw_object_right world)
+  (cond
+    [...]
+    [else...]))
+
+
+; draw_void_region : World -> Image
+; To draw the void region based on the level from the world.
+; Using the level and the "void_region_ramp_up" rate draws the void region.
+; Game stops when the void_region is equalto or greater than the width. That's the max-level.
+; Call win_game function accordingly.
+; {This will be called by "draw_object_right.}
+; {This calls draw_level}
+
+(define (draw_void_region world)
+  (cond
+    [...]
+    [else...]))
+
+
+; draw_level : world -> Image
+; Using the level from the world
+; & using the "world-width" and "world-height"
+; the level is displayed for the user to
+; keep a tab. In the top right corner.
+; This uses "EMPTY" while placing image.
+; "EMPTY" sets the scene based on the world-width and world-height.
+; { Is called by "draw_void_region"}
+
+(define (draw_level world))
+
+
+
 ; Big bang definition
 (big-bang (make-world start_level left_obj_starting_posn right_obj_starting_posn initial_game_status)
           [on-tick tick game_speed]
           [on-key key]
-          [to-draw draw]
+          [to-draw draw_object_left]
           [stop-when world-stop])
